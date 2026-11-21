@@ -115,7 +115,8 @@ Durations are estimates and will be adjusted to the final submission date. Finis
 
 ```
 DineEase/
-├── frontend/        HTML, CSS, JavaScript files
+├── frontend/        HTML + JavaScript pages
+│   └── css/style.css    All CSS (separate file)
 ├── backend/         Node.js + Express server
 ├── database/        database.sql
 ├── docs/            Plan.md, Architecture.md, Agent.md, Task.md, proposal PDF
