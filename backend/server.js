@@ -2,12 +2,13 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const db = require("./db");
+const menuRoutes = require("./routes/menu");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+app.use("/api", menuRoutes);
 // Test route to check that the server is running
 app.get("/", (req, res) => {
   res.send("DineEase server is running");
