@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const db = require("../db");
 
 const router = express.Router();
@@ -35,6 +36,44 @@ router.post("/auth/register", async (req, res) => {
     res.status(201).json({ message: "Account created" });
   } catch (error) {
     res.status(500).json({ message: "Could not create the account" });
+  }
+});
+
+// Log in with email and password
+router.post("/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
+
+  try {
+    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+
+    if (rows.length === 0) {
+      return res.status(401).json({ message: "Wrong email or password" });
+    }
+
+    const user = rows[0];
+    const passwordMatches = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatches) {
+      return res.status(401).json({ message: "Wrong email or password" });
+    }
+
+    // Make a token that proves who the user is (valid for 7 days)
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      token: token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Could not log in" });
   }
 });
 
