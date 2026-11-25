@@ -10,12 +10,20 @@
   <ul id="menu-list"></ul>
 
   <script>
+    // Live server address (replace with your own Render link)
+    let API_URL = "https://dineease-api.onrender.com";
+
+    // When testing on this computer, use the local server instead
+    if (location.protocol === "file:" || location.hostname === "localhost") {
+      API_URL = "http://localhost:5000";
+    }
+
     const menuList = document.getElementById("menu-list");
 
     // Ask the backend for the menu and show each item in the list
     async function loadMenu() {
       try {
-        const response = await fetch("http://localhost:5000/api/menu");
+        const response = await fetch(API_URL + "/api/menu");
         const items = await response.json();
 
         for (let i = 0; i < items.length; i++) {
