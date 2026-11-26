@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../db");
+const { requireLogin } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -74,6 +75,24 @@ router.post("/auth/login", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Could not log in" });
+  }
+});
+
+// Show who is logged in (also used to test the login check)
+router.get("/auth/me", requireLogin, async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT id, name, email, phone, role FROM users WHERE id = ?",
+      [req.user.id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: "Could not load the user" });
   }
 });
 
