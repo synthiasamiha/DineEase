@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Register - DineEase</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container bar">
+      <a class="logo" href="menu.html">DineEase</a>
+      <button id="burger" aria-label="Menu">&#9776;</button>
+      <nav id="nav">
+        <a href="menu.html">Menu</a>
+        <a href="about.html">About Us</a>
+        <a href="reservation.html">Reservation</a>
+        <a href="contact.html">Contact</a>
+        <span id="auth-links">
+          <a href="login.html">Login</a>
+          <a class="btn small" href="register.html">Register</a>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="form-box">
+      <h1>Create account</h1>
+      <p>Join DineEase to order food and book tables.</p>
+
+      <form id="register-form" novalidate>
+        <label>Full name
+          <input type="text" id="name" placeholder="Your full name">
+        </label>
+        <label>Email
+          <input type="email" id="email" placeholder="you@example.com">
+        </label>
+        <label>Phone (optional)
+          <input type="text" id="phone" placeholder="01XXXXXXXXX">
+        </label>
+        <label>Password
+          <input type="password" id="password" placeholder="At least 6 characters">
+        </label>
+        <label>Confirm password
+          <input type="password" id="confirm" placeholder="Type the password again">
+        </label>
+
+        <div id="message" class="msg"></div>
+        <button type="submit" class="btn">Register</button>
+      </form>
+
+      <p class="form-note">Already have an account? <a href="login.html">Login</a></p>
+    </div>
+  </main>
+
+  <script>
+    // Live server address. When testing on this computer, use the local server.
+    let API_URL = "https://dineease-api.onrender.com";
+
+    if (location.protocol === "file:" || location.hostname === "localhost") {
+      API_URL = "http://localhost:5000";
+    }
+
+    const authLinks = document.getElementById("auth-links");
+    const message = document.getElementById("message");
+
+    // Menu button on small screens
+    document.getElementById("burger").onclick = function () {
+      document.getElementById("nav").classList.toggle("show");
+    };
+
+    // If the user is logged in, show the name and a logout button
+    function showAuthLinks() {
+      const savedUser = localStorage.getItem("user");
+
+      if (!savedUser) {
+        return;
+      }
+
+      const user = JSON.parse(savedUser);
+      const hello = document.createElement("span");
+      const logout = document.createElement("button");
+
+      hello.textContent = "Hi, " + user.name;
+      logout.textContent = "Logout";
+      logout.className = "btn small";
+
+      logout.onclick = function () {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      };
+
+      authLinks.innerHTML = "";
+      authLinks.appendChild(hello);
+      authLinks.appendChild(logout);
+    }
+
+    function showMessage(text, isError) {
+      message.textContent = text;
+      message.className = isError ? "msg error" : "msg success";
+    }
+
+    document.getElementById("register-form").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value;
+      const confirm = document.getElementById("confirm").value;
+
+      if (name.length < 3) {
+        showMessage("Please enter your full name", true);
+        return;
+      }
+
+      if (!email.includes("@") || !email.includes(".")) {
+        showMessage("Please enter a valid email", true);
+        return;
+      }
+
+      if (phone !== "" && !/^01\d{9}$/.test(phone)) {
+        showMessage("Phone must be 11 digits, like 01XXXXXXXXX", true);
+        return;
+      }
+
+      if (password.length < 6) {
+        showMessage("Password must be at least 6 characters", true);
+        return;
+      }
+
+      if (password !== confirm) {
+        showMessage("The two passwords do not match", true);
+        return;
+      }
+
+      showMessage("Please wait...", false);
+
+      try {
+        const response = await fetch(API_URL + "/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: name, email: email, phone: phone, password: password }),
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          showMessage(data.message, true);
+          return;
+        }
+
+        showMessage("Account created! Taking you to the login page...", false);
+
+        setTimeout(function () {
+          window.location.href = "login.html";
+        }, 1500);
+      } catch (error) {
+        showMessage("Could not reach the server. Please try again.", true);
+      }
+    });
+
+    showAuthLinks();
+  </script>
+</body>
+</html>

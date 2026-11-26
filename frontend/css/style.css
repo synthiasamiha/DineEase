@@ -1,0 +1,189 @@
+/* DineEase - shared styles (white background, green buttons) */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Calibri, Arial, sans-serif;
+  background: #ffffff;
+  color: #17211c;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Header and navigation */
+header {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e4eae6;
+  z-index: 10;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 62px;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #12805c;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+nav a {
+  color: #5f6d66;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+nav a:hover {
+  color: #12805c;
+}
+
+#burger {
+  display: none;
+  background: none;
+  border: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+#auth-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  background: #12805c;
+  color: #ffffff;
+  border: 0;
+  border-radius: 99px;
+  padding: 11px 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #0d6648;
+}
+
+.btn.small {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+}
+
+/* Forms */
+.form-box {
+  max-width: 440px;
+  margin: 40px auto;
+  background: #ffffff;
+  border: 1px solid #e4eae6;
+  border-radius: 20px;
+  padding: 26px;
+}
+
+.form-box h1 {
+  margin: 0 0 4px;
+  font-size: 1.7rem;
+}
+
+.form-box p {
+  margin: 0 0 18px;
+  color: #5f6d66;
+}
+
+label {
+  display: block;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+input {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 11px 13px;
+  border: 1px solid #e4eae6;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: 2px solid #12805c;
+}
+
+.msg {
+  min-height: 1.4em;
+  margin: 4px 0 12px;
+  font-weight: 600;
+}
+
+.msg.error {
+  color: #c92a2a;
+}
+
+.msg.success {
+  color: #2b8a3e;
+}
+
+.form-box .btn {
+  width: 100%;
+}
+
+.form-note {
+  margin: 16px 0 0;
+  text-align: center;
+}
+
+.form-note a {
+  color: #12805c;
+  font-weight: 700;
+}
+
+/* Small screens */
+@media (max-width: 700px) {
+  #burger {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    position: absolute;
+    top: 62px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #e4eae6;
+  }
+
+  nav.show {
+    display: flex;
+  }
+}
