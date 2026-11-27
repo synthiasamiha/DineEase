@@ -163,6 +163,202 @@ input:focus {
   font-weight: 700;
 }
 
+/* Page titles */
+.page-title {
+  margin: 28px 0 4px;
+  font-size: 1.8rem;
+}
+
+.page-sub {
+  margin: 0 0 18px;
+  color: #5f6d66;
+}
+
+/* Menu page: search, category buttons and food cards */
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.tools input {
+  flex: 1;
+  min-width: 180px;
+  margin-top: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.chips button {
+  border: 1px solid #e4eae6;
+  background: #ffffff;
+  border-radius: 99px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.chips button.on {
+  background: #12805c;
+  border-color: #12805c;
+  color: #ffffff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e4eae6;
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+}
+
+.card .icon {
+  font-size: 2.8rem;
+  background: #f5f8f6;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  margin: 4px 0;
+}
+
+.card p {
+  margin: 0 0 8px;
+  color: #5f6d66;
+  font-size: 0.92rem;
+}
+
+.price {
+  font-weight: 800;
+  color: #12805c;
+  margin-right: 8px;
+}
+
+/* Small message that appears for a moment */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #17211c;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 99px;
+  font-weight: 600;
+  display: none;
+  z-index: 20;
+}
+
+/* Cart page */
+.cart-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e4eae6;
+}
+
+.cart-name {
+  flex: 1;
+  min-width: 150px;
+}
+
+.cart-name small {
+  display: block;
+  color: #5f6d66;
+}
+
+.qty button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #e4eae6;
+  background: #ffffff;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.qty span {
+  display: inline-block;
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.remove {
+  background: none;
+  border: 0;
+  color: #c92a2a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.order-form {
+  max-width: 480px;
+  margin-bottom: 40px;
+}
+
+/* Orders page */
+.order-card {
+  border: 1px solid #e4eae6;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.order-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.status {
+  background: #e7f5ee;
+  color: #12805c;
+  border-radius: 99px;
+  padding: 2px 12px;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.order-card ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.order-card small {
+  color: #5f6d66;
+}
+
 /* Small screens */
 @media (max-width: 700px) {
   #burger {

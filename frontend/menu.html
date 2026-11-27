@@ -4,38 +4,254 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Menu - DineEase</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>Our Menu</h1>
-  <ul id="menu-list"></ul>
+  <header>
+    <div class="container bar">
+      <a class="logo" href="menu.html">DineEase</a>
+      <button id="burger" aria-label="Menu">&#9776;</button>
+      <nav id="nav">
+        <a href="menu.html">Menu</a>
+        <a href="about.html">About Us</a>
+        <a href="reservation.html">Reservation</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+        <a href="orders.html">My Orders</a>
+        <span id="auth-links">
+          <a href="login.html">Login</a>
+          <a class="btn small" href="register.html">Register</a>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Our Menu</h1>
+    <p class="page-sub">Freshly made every day</p>
+
+    <div class="tools">
+      <input type="text" id="search" placeholder="Search dishes...">
+    </div>
+    <div class="chips" id="chips"></div>
+
+    <div class="grid" id="menu-grid">Loading menu...</div>
+  </main>
+
+  <div class="toast" id="toast"></div>
 
   <script>
-    // Live server address (replace with your own Render link)
+    // Live server address. When testing on this computer, use the local server.
     let API_URL = "https://dineease-api.onrender.com";
 
-    // When testing on this computer, use the local server instead
     if (location.protocol === "file:" || location.hostname === "localhost") {
       API_URL = "http://localhost:5000";
     }
 
-    const menuList = document.getElementById("menu-list");
+    const authLinks = document.getElementById("auth-links");
 
-    // Ask the backend for the menu and show each item in the list
-    async function loadMenu() {
-      try {
-        const response = await fetch(API_URL + "/api/menu");
-        const items = await response.json();
+    // Menu button on small screens
+    document.getElementById("burger").onclick = function () {
+      document.getElementById("nav").classList.toggle("show");
+    };
 
-        for (let i = 0; i < items.length; i++) {
-          const li = document.createElement("li");
-          li.textContent = items[i].name + " - Tk " + items[i].price;
-          menuList.appendChild(li);
+    // If the user is logged in, show the name and a logout button
+    function showAuthLinks() {
+      const savedUser = localStorage.getItem("user");
+
+      if (!savedUser) {
+        return;
+      }
+
+      const user = JSON.parse(savedUser);
+      const hello = document.createElement("span");
+      const logout = document.createElement("button");
+
+      hello.textContent = "Hi, " + user.name;
+      logout.textContent = "Logout";
+      logout.className = "btn small";
+
+      logout.onclick = function () {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      };
+
+      authLinks.innerHTML = "";
+      authLinks.appendChild(hello);
+      authLinks.appendChild(logout);
+    }
+
+    // The cart is kept in the browser as a list of items
+    function getCart() {
+      const saved = localStorage.getItem("cart");
+
+      if (!saved) {
+        return [];
+      }
+
+      return JSON.parse(saved);
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+    }
+
+    // Show the total number of items next to the Cart link
+    function updateCartCount() {
+      const cart = getCart();
+      let count = 0;
+
+      for (let i = 0; i < cart.length; i++) {
+        count = count + cart[i].quantity;
+      }
+
+      document.getElementById("cart-count").textContent = count;
+    }
+
+    const menuGrid = document.getElementById("menu-grid");
+    const chipsBox = document.getElementById("chips");
+    const searchBox = document.getElementById("search");
+    const toast = document.getElementById("toast");
+
+    let allItems = [];
+    let selectedCategory = "All";
+
+    // A small picture for each category
+    const icons = {
+      "Starter": "\u{1F372}",
+      "Main": "\u{1F35B}",
+      "Fast Food": "\u{1F354}",
+      "Dessert": "\u{1F370}",
+      "Drinks": "\u{1F96D}",
+    };
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.style.display = "block";
+
+      setTimeout(function () {
+        toast.style.display = "none";
+      }, 1200);
+    }
+
+    function addToCart(item) {
+      const cart = getCart();
+      let found = false;
+
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id === item.id) {
+          cart[i].quantity = cart[i].quantity + 1;
+          found = true;
         }
-      } catch (error) {
-        menuList.textContent = "Could not load the menu";
+      }
+
+      if (!found) {
+        cart.push({ id: item.id, name: item.name, price: Number(item.price), quantity: 1 });
+      }
+
+      saveCart(cart);
+      showToast(item.name + " added to cart");
+    }
+
+    // Category buttons: All + every category found in the menu
+    function showChips() {
+      const names = ["All"];
+
+      for (let i = 0; i < allItems.length; i++) {
+        if (!names.includes(allItems[i].category)) {
+          names.push(allItems[i].category);
+        }
+      }
+
+      chipsBox.innerHTML = "";
+
+      for (let i = 0; i < names.length; i++) {
+        const button = document.createElement("button");
+        button.textContent = names[i];
+
+        if (names[i] === selectedCategory) {
+          button.className = "on";
+        }
+
+        button.onclick = function () {
+          selectedCategory = names[i];
+          showChips();
+          showMenu();
+        };
+
+        chipsBox.appendChild(button);
       }
     }
 
+    function makeCard(item) {
+      const card = document.createElement("div");
+      const icon = document.createElement("div");
+      const name = document.createElement("h3");
+      const description = document.createElement("p");
+      const price = document.createElement("span");
+      const button = document.createElement("button");
+
+      card.className = "card";
+      icon.className = "icon";
+      icon.textContent = icons[item.category] || "\u{1F37D}";
+      name.textContent = item.name;
+      description.textContent = item.description;
+      price.className = "price";
+      price.textContent = "Tk " + Number(item.price);
+      button.className = "btn small";
+      button.textContent = "Add";
+
+      button.onclick = function () {
+        addToCart(item);
+      };
+
+      card.append(icon, name, description, price, button);
+      return card;
+    }
+
+    // Show the items that match the chosen category and the search words
+    function showMenu() {
+      const words = searchBox.value.trim().toLowerCase();
+      menuGrid.innerHTML = "";
+      let shown = 0;
+
+      for (let i = 0; i < allItems.length; i++) {
+        const item = allItems[i];
+
+        if (selectedCategory !== "All" && item.category !== selectedCategory) {
+          continue;
+        }
+
+        if (!item.name.toLowerCase().includes(words)) {
+          continue;
+        }
+
+        menuGrid.appendChild(makeCard(item));
+        shown = shown + 1;
+      }
+
+      if (shown === 0) {
+        menuGrid.textContent = "No dishes found.";
+      }
+    }
+
+    async function loadMenu() {
+      try {
+        const response = await fetch(API_URL + "/api/menu");
+        allItems = await response.json();
+        showChips();
+        showMenu();
+      } catch (error) {
+        menuGrid.textContent = "Could not load the menu";
+      }
+    }
+
+    searchBox.oninput = showMenu;
+
+    showAuthLinks();
+    updateCartCount();
     loadMenu();
   </script>
 </body>

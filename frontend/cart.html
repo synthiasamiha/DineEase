@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cart - DineEase</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container bar">
+      <a class="logo" href="menu.html">DineEase</a>
+      <button id="burger" aria-label="Menu">&#9776;</button>
+      <nav id="nav">
+        <a href="menu.html">Menu</a>
+        <a href="about.html">About Us</a>
+        <a href="reservation.html">Reservation</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+        <a href="orders.html">My Orders</a>
+        <span id="auth-links">
+          <a href="login.html">Login</a>
+          <a class="btn small" href="register.html">Register</a>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Your Cart</h1>
+
+    <div id="cart-list"></div>
+
+    <div id="order-box" class="order-form">
+      <div class="cart-total"><span>Total</span><span id="total">Tk 0</span></div>
+
+      <label>Delivery address
+        <input type="text" id="address" placeholder="House, road, area">
+      </label>
+      <label>Phone
+        <input type="text" id="phone" placeholder="01XXXXXXXXX">
+      </label>
+
+      <div id="message" class="msg"></div>
+      <button id="place-order" class="btn">Place Order</button>
+    </div>
+  </main>
+
+  <script>
+    // Live server address. When testing on this computer, use the local server.
+    let API_URL = "https://dineease-api.onrender.com";
+
+    if (location.protocol === "file:" || location.hostname === "localhost") {
+      API_URL = "http://localhost:5000";
+    }
+
+    const authLinks = document.getElementById("auth-links");
+
+    // Menu button on small screens
+    document.getElementById("burger").onclick = function () {
+      document.getElementById("nav").classList.toggle("show");
+    };
+
+    // If the user is logged in, show the name and a logout button
+    function showAuthLinks() {
+      const savedUser = localStorage.getItem("user");
+
+      if (!savedUser) {
+        return;
+      }
+
+      const user = JSON.parse(savedUser);
+      const hello = document.createElement("span");
+      const logout = document.createElement("button");
+
+      hello.textContent = "Hi, " + user.name;
+      logout.textContent = "Logout";
+      logout.className = "btn small";
+
+      logout.onclick = function () {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      };
+
+      authLinks.innerHTML = "";
+      authLinks.appendChild(hello);
+      authLinks.appendChild(logout);
+    }
+
+    // The cart is kept in the browser as a list of items
+    function getCart() {
+      const saved = localStorage.getItem("cart");
+
+      if (!saved) {
+        return [];
+      }
+
+      return JSON.parse(saved);
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+    }
+
+    // Show the total number of items next to the Cart link
+    function updateCartCount() {
+      const cart = getCart();
+      let count = 0;
+
+      for (let i = 0; i < cart.length; i++) {
+        count = count + cart[i].quantity;
+      }
+
+      document.getElementById("cart-count").textContent = count;
+    }
+
+    const cartList = document.getElementById("cart-list");
+    const orderBox = document.getElementById("order-box");
+    const message = document.getElementById("message");
+
+    function showMessage(text, isError) {
+      message.textContent = text;
+      message.className = isError ? "msg error" : "msg success";
+    }
+
+    function changeQuantity(id, change) {
+      const cart = getCart();
+
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id === id) {
+          cart[i].quantity = cart[i].quantity + change;
+        }
+      }
+
+      // Keep only the items that still have a quantity
+      const left = [];
+
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].quantity > 0 && cart[i].quantity <= 20) {
+          left.push(cart[i]);
+        } else if (cart[i].quantity > 20) {
+          cart[i].quantity = 20;
+          left.push(cart[i]);
+        }
+      }
+
+      saveCart(left);
+      showCart();
+    }
+
+    function removeItem(id) {
+      const cart = getCart();
+      const left = [];
+
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id !== id) {
+          left.push(cart[i]);
+        }
+      }
+
+      saveCart(left);
+      showCart();
+    }
+
+    function makeRow(item) {
+      const row = document.createElement("div");
+      const name = document.createElement("div");
+      const qty = document.createElement("div");
+      const minus = document.createElement("button");
+      const count = document.createElement("span");
+      const plus = document.createElement("button");
+      const lineTotal = document.createElement("strong");
+      const remove = document.createElement("button");
+
+      row.className = "cart-row";
+      name.className = "cart-name";
+      name.textContent = item.name;
+
+      const each = document.createElement("small");
+      each.textContent = "Tk " + item.price + " each";
+      name.appendChild(each);
+
+      qty.className = "qty";
+      minus.textContent = "-";
+      plus.textContent = "+";
+      count.textContent = item.quantity;
+      qty.append(minus, count, plus);
+
+      lineTotal.textContent = "Tk " + item.price * item.quantity;
+      remove.className = "remove";
+      remove.textContent = "Remove";
+
+      minus.onclick = function () {
+        changeQuantity(item.id, -1);
+      };
+
+      plus.onclick = function () {
+        changeQuantity(item.id, 1);
+      };
+
+      remove.onclick = function () {
+        removeItem(item.id);
+      };
+
+      row.append(name, qty, lineTotal, remove);
+      return row;
+    }
+
+    function showCart() {
+      const cart = getCart();
+      let total = 0;
+      cartList.innerHTML = "";
+
+      if (cart.length === 0) {
+        cartList.innerHTML = '<p>Your cart is empty. <a href="menu.html">Go to the menu</a></p>';
+        orderBox.style.display = "none";
+        return;
+      }
+
+      orderBox.style.display = "block";
+
+      for (let i = 0; i < cart.length; i++) {
+        cartList.appendChild(makeRow(cart[i]));
+        total = total + cart[i].price * cart[i].quantity;
+      }
+
+      document.getElementById("total").textContent = "Tk " + total;
+    }
+
+    document.getElementById("place-order").onclick = async function () {
+      const token = localStorage.getItem("token");
+      const address = document.getElementById("address").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!token) {
+        showMessage("Please login first to place an order", true);
+        return;
+      }
+
+      if (address.length < 5) {
+        showMessage("Please enter your delivery address", true);
+        return;
+      }
+
+      if (!/^01\d{9}$/.test(phone)) {
+        showMessage("Phone must be 11 digits, like 01XXXXXXXXX", true);
+        return;
+      }
+
+      // Send only the item ids and quantities. The server finds the prices itself.
+      const cart = getCart();
+      const items = [];
+
+      for (let i = 0; i < cart.length; i++) {
+        items.push({ menu_item_id: cart[i].id, quantity: cart[i].quantity });
+      }
+
+      showMessage("Placing your order...", false);
+
+      try {
+        const response = await fetch(API_URL + "/api/orders", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token,
+          },
+          body: JSON.stringify({ items: items, address: address, phone: phone }),
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          showMessage(data.message, true);
+          return;
+        }
+
+        saveCart([]);
+        showMessage("Order placed! Taking you to your orders...", false);
+
+        setTimeout(function () {
+          window.location.href = "orders.html";
+        }, 1500);
+      } catch (error) {
+        showMessage("Could not reach the server. Please try again.", true);
+      }
+    };
+
+    showAuthLinks();
+    updateCartCount();
+    showCart();
+  </script>
+</body>
+</html>
