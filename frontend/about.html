@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Us - DineEase</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container bar">
+      <a class="logo" href="index.html">DineEase</a>
+      <button id="burger" aria-label="Menu">&#9776;</button>
+      <nav id="nav">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="about.html">About Us</a>
+        <a href="reservation.html">Reservation</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+        <a href="orders.html">My Orders</a>
+        <span id="auth-links">
+          <a href="login.html">Login</a>
+          <a class="btn small" href="register.html">Register</a>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">About Us</h1>
+    <p class="page-sub">Cooking with passion, serving with a smile</p>
+
+    <div class="info-box">
+      <h3>Our story</h3>
+      <p>DineEase started with a simple idea: good food should be easy to enjoy. We cook with fresh ingredients and make every plate with care. Now you can also order online and book your table from your phone.</p>
+    </div>
+
+    <h2 class="section-title">What we believe in</h2>
+    <div class="grid">
+      <div class="card"><div class="icon">&#x1F96C;</div><h3>Fresh</h3><p>Ingredients bought daily</p></div>
+      <div class="card"><div class="icon">&#x2764;&#xFE0F;</div><h3>Made with care</h3><p>Every dish is checked before it leaves the kitchen</p></div>
+      <div class="card"><div class="icon">&#x26A1;</div><h3>Fast service</h3><p>Quick orders and short waiting</p></div>
+    </div>
+
+    <div class="info-box">
+      <h3>Opening hours</h3>
+      <p>Every day, 11:00 AM - 11:00 PM</p>
+      <p>Zindabazar, Sylhet &middot; 01700-000000</p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <strong>DineEase</strong> &middot; Open daily 11:00 AM - 11:00 PM &middot; Zindabazar, Sylhet &middot; 01700-000000
+    </div>
+  </footer>
+
+  <script>
+    // Live server address. When testing on this computer, use the local server.
+    let API_URL = "https://dineease-api.onrender.com";
+
+    if (location.protocol === "file:" || location.hostname === "localhost") {
+      API_URL = "http://localhost:5000";
+    }
+
+    const authLinks = document.getElementById("auth-links");
+
+    // Menu button on small screens
+    document.getElementById("burger").onclick = function () {
+      document.getElementById("nav").classList.toggle("show");
+    };
+
+    // If the user is logged in, show the name and a logout button
+    function showAuthLinks() {
+      const savedUser = localStorage.getItem("user");
+
+      if (!savedUser) {
+        return;
+      }
+
+      const user = JSON.parse(savedUser);
+      const hello = document.createElement("span");
+      const logout = document.createElement("button");
+
+      hello.textContent = "Hi, " + user.name;
+      logout.textContent = "Logout";
+      logout.className = "btn small";
+
+      logout.onclick = function () {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      };
+
+      authLinks.innerHTML = "";
+      authLinks.appendChild(hello);
+      authLinks.appendChild(logout);
+    }
+
+    // The cart is kept in the browser as a list of items
+    function getCart() {
+      const saved = localStorage.getItem("cart");
+
+      if (!saved) {
+        return [];
+      }
+
+      return JSON.parse(saved);
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+    }
+
+    // Show the total number of items next to the Cart link
+    function updateCartCount() {
+      const cart = getCart();
+      let count = 0;
+
+      for (let i = 0; i < cart.length; i++) {
+        count = count + cart[i].quantity;
+      }
+
+      document.getElementById("cart-count").textContent = count;
+    }
+
+    showAuthLinks();
+    updateCartCount();
+  </script>
+</body>
+</html>

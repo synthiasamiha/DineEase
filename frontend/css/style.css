@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -43,13 +43,14 @@ header {
 nav {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 nav a {
   color: #5f6d66;
   text-decoration: none;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 nav a:hover {
@@ -381,5 +382,91 @@ input:focus {
 
   nav.show {
     display: flex;
+  }
+}
+
+/* Home page */
+.hero {
+  text-align: center;
+  padding: 56px 0 40px;
+}
+
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: 2.6rem;
+  line-height: 1.15;
+}
+
+.hero p {
+  margin: 0 0 22px;
+  color: #5f6d66;
+  font-size: 1.1rem;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn.outline {
+  background: #ffffff;
+  color: #12805c;
+  border: 2px solid #12805c;
+}
+
+.btn.outline:hover {
+  background: #e7f5ee;
+}
+
+.section-title {
+  margin: 36px 0 14px;
+  font-size: 1.5rem;
+}
+
+.info-box {
+  background: #f5f8f6;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.info-box h3 {
+  margin: 0 0 6px;
+}
+
+.info-box p {
+  margin: 4px 0;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 11px 13px;
+  border: 1px solid #e4eae6;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+textarea:focus {
+  outline: 2px solid #12805c;
+}
+
+footer {
+  margin-top: 40px;
+  padding: 22px 0;
+  background: #f5f8f6;
+  border-top: 1px solid #e4eae6;
+  text-align: center;
+  color: #5f6d66;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 700px) {
+  .hero h1 {
+    font-size: 2rem;
   }
 }

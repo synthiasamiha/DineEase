@@ -5,6 +5,8 @@ const db = require("./db");
 const menuRoutes = require("./routes/menu");
 const authRoutes = require("./routes/auth");
 const orderRoutes = require("./routes/orders");
+const reservationRoutes = require("./routes/reservations");
+const contactRoutes = require("./routes/contact");
 
 const app = express();
 
@@ -13,6 +15,8 @@ app.use(express.json());
 app.use("/api", menuRoutes);
 app.use("/api", authRoutes);
 app.use("/api", orderRoutes);
+app.use("/api", reservationRoutes);
+app.use("/api", contactRoutes);
 
 // Test route to check that the server is running
 app.get("/", (req, res) => {
